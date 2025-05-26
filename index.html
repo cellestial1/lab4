@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Вхід / Реєстрація</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    form { margin-bottom: 30px; }
+    label, input { display: block; margin-top: 10px; }
+    .error { color: red; }
+    .success { color: green; }
+  </style>
+</head>
+<body>
+  <h2>Реєстрація</h2>
+  <form id="registerForm">
+    <label>Email:
+      <input type="email" id="regEmail" required />
+    </label>
+    <label>Пароль:
+      <input type="password" id="regPassword" required minlength="6" />
+    </label>
+    <button type="submit">Зареєструватися</button>
+    <p class="error" id="regError"></p>
+    <p class="success" id="regSuccess"></p>
+  </form>
+  <script>
+    // Реєстрація
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const error = document.getElementById('regError');
+      const success = document.getElementById('regSuccess');
+      error.textContent = '';
+      success.textContent = '';
+
+      if (!email.includes('@') || password.length < 6) {
+        error.textContent = 'Невірний email або пароль занадто короткий.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          success.textContent = data.message;
+        } else {
+          error.textContent = data.message;
+        }
+      } catch {
+        error.textContent = 'Помилка з’єднання з сервером.';
+      }
+    });
+
+    // Вхід
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('logEmail').value.trim();
+      const password = document.getElementById('logPassword').value.trim();
+      const error = document.getElementById('logError');
+      const success = document.getElementById('logSuccess');
+      error.textContent = '';
+      success.textContent = '';
+
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          success.textContent = data.message;
+        } else {
+          error.textContent = data.message;
+        }
+      } catch {
+        error.textContent = 'Помилка з’єднання з сервером.';
+      }
+    });
+  </script>
+</body>
+</html>
